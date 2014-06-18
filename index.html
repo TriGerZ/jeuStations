@@ -18,6 +18,7 @@
         context.drawImage(imageObj, 0, 0);
     };
     imageObj.src = "content/carte.jpg";
+
     window.onload = function()
     {
         var xhr = getXMLHttpRequest();
@@ -26,7 +27,9 @@
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
                 var stations = JSON.parse(xhr.responseText);
-
+                console.log(stations[0]);
+                var item = stations[0];
+                drawCircle(canvas, item.x/10, item.y/10);
             }
         };
     }
@@ -53,6 +56,21 @@
         }
 
         return xhr;
+    }
+
+    /**
+     * Draw a circle at a specific location within the canvas
+     * @param x
+     * @param y
+     */
+    function drawCircle(canvas, x, y){
+        var radius = 8;
+
+        context.beginPath();
+        context.arc(x, y, radius, 0, 2 * Math.PI, false);
+        context.fillStyle = 'red';
+        context.fill();
+        context.stroke();
     }
 
 </script>
