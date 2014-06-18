@@ -12,7 +12,7 @@ window.onload = function()
 	var canvas = document.getElementById("carte_ratp");
 	var context = canvas.getContext("2d");
 	var image = new Image();
-	image.src = "1.jpg";
+	image.src = "content/carte.jpg";
 	context.drawImage(image,0,0);
 
 	var xhr = getXMLHttpRequest();
@@ -20,11 +20,10 @@ window.onload = function()
 	xhr.send(null);
 	  xhr.onreadystatechange = function() {
         if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
-        	var FichierTexte = xhr.responseText;
-        	alert(JSON.parse(FichierTexte)); 
+        	var stations = JSON.parse(xhr.responseText);
+        	console.log(stations);
         }
        };
-
 }
 
 /*
