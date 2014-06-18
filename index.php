@@ -2,7 +2,11 @@
 L'objet Canvas ne marche pas chez vous, veuillez utiliser un navigateur récent.
 </canvas>
 
-
+<div id="autosuggestdiv">
+    Quel est la gare selectionnée ?<br>
+    <input type="text" name="subject" id="subject" onkeyup="actualiser()"  />
+    <div id="result" style="margin-left: 3px;width: 150px;border-left: solid black 1px;border-right: solid black 1px;border-bottom: solid black 1px;"  ></div>
+</div>
 <script>
 
 
@@ -26,6 +30,23 @@ window.onload = function()
        };
 }
 
+function random( tab )
+{
+    var n = Math.floor(tab.length * Math.random());
+    return n;
+}
+
+function getGares( complet )
+{
+
+    var a = new Array();
+
+    for( i = 0; i < complet.length ; i++)
+    {
+        a.push(complet[i]);
+    }
+    return a;
+}
 /*
 Charge l'objet HttpRequest
 */
