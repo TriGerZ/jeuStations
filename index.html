@@ -14,32 +14,84 @@
     L'objet Canvas ne marche pas chez vous, veuillez utiliser un navigateur récent.
 </canvas>
 
-<input type="text" name="subject" id="subject" onkeyup="refreshAC()"  />
+<h2>Quelle est cette station ?</h2>
+<input type="text" name="subject" id="subject"  />
+<button id="submit">Valider</button>
 <div id="result" style="margin-left: 3px;width: 150px;border-left: solid black 1px;border-right: solid black 1px;border-bottom: solid black 1px;"  ></div>
 
 <script>
     var canvas = document.getElementById('carte_ratp');
     var context = canvas.getContext('2d');
-    var xhr = getXMLHttpRequest();
+    var autoload = document.getElementById('subject');
+    var submit = document.getElementById('submit');
     var stations;
+
     var res = document.getElementById("result");
+    var station;
     window.onload = function()
     {
-        xhr.open("GET", "ChargementStations.php" , true);
-        xhr.send(null);
+        request(readData);
+
+        autoload.onkeyup = function(){
+            refreshAC(stations);
+        }
+
+        submit.onclick = function(){
+            var userStation = autoload.dataset.id;
+            console.log('station: '+station)
+            console.log('station id: '+station.id)
+            console.log('userStation: ' + userStation)
+            if(userStation == station.id){
+                console.log('On lui rajoute un point');
+            }else{
+                console.log('on indique le fail');
+            }
+            clearCanvas();
+            station = drawRandomCircle(stations);
+        }
+    }
+
+    /**
+     *
+     */
+    function request(callback){
+        var xhr = getXMLHttpRequest();
+
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
-                stations = JSON.parse(xhr.responseText);
-                var item = stations[1];
-                stations.forEach(function(station){
-                    if(station.type == 'metro'){
-                        drawCircle(canvas, station.x, station.y);
-                    }
-
-                })
-
+                callback(xhr.responseText);
             }
         };
+
+        xhr.open("GET", "ChargementStations.php" , true);
+        xhr.send(null);
+    }
+
+    /**
+     * @param rawData
+     */
+    function readData(rawData){
+        stations = JSON.parse(rawData).filter(isMetro);
+        station = drawRandomCircle(stations);
+    }
+
+    /**
+     * @param stations
+     * @return station
+     */
+    function drawRandomCircle(stations){
+        var station = stations[random(stations)];
+        drawCircle(canvas, station.x, station.y);
+        return station;
+    }
+
+    function clearCanvas(){
+        context.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+
+    function isMetro(station){
+        return (station.type == 'metro');
     }
 
     /**
@@ -71,21 +123,20 @@
      * @param x
      * @param y
      */
-    function drawCircle(canvas, x, y, name){
+    function drawCircle(canvas, x, y){
         var RESIZE = 10;
-        var RADIUS = 8;
+        var RADIUS = 4;
 
         context.beginPath();
         context.arc(x/RESIZE, y/RESIZE, RADIUS, 0, 2 * Math.PI, false);
         context.fillStyle = 'red';
         context.fill();
         context.stroke();
-        // console.log(name);
-
-        context.font = "bold 16px Arial";
-        context.fillText(name, x, y);
     }
 
+    /**
+     *
+     */
     function drawText(name, x, y){
         var RESIZE = 10;
         context.font = "bold 8px Arial";
@@ -94,53 +145,54 @@
     }
 
     /**
-     *
+     * Return a random number between 0 and the number of object inside tab
      * @param tab
      * @returns {number}
      */
     function random( tab )
     {
-        var n = Math.floor(tab.length * Math.random());
-        return n;
+        return Math.floor(tab.length * Math.random());
     }
 
     /**
      * Refresh the autocomplete
      */
-    function refreshAC()
+    function refreshAC(stations)
     {
+        try{
+            var sub = document.getElementById("subject");
+            var val = sub.value;
 
-        var sub = document.getElementById("subject");
-        var val = sub.value;
-
-        res.innerHTML = "";
-        if( val != "" )
-        {
-            stations.forEach(function(station){
-                if(station.type =='metro'){
+            res.innerHTML = "";
+            if( val != "" )
+            {
+                stations.forEach(function(station){
                     var rgxp = new RegExp('^'+val, "g");
                     if(station.name.match(rgxp) != null && station.name.match(rgxp).length){
-
-                        res.innerHTML += "<div id='element' onmouseout='selectionPointer2(this)' onmouseover='selectionPointer(this)' onclick='selectionClique(this.innerHTML)'>"+station.name+"</div>";
-
+                        res.innerHTML += "<div id="+station.id+" onmouseout='selectionPointer2(this)' onmouseover='selectionPointer(this)' onclick='selectionClique(this)'>"+station.name+"</div>";
                     }
-                }
-            });
+                });
+            }
         }
+        catch (err){
+            console.log(err);
+        }
+
     }
 
-    function selectionPointer2( id )
+    function selectionPointer2( element )
     {
-        id.style.backgroundColor = "white";
+        element.style.backgroundColor = "white";
     }
-    function selectionPointer( id )
+    function selectionPointer( element )
     {
-        id.style.backgroundColor = "green";
+        element.style.backgroundColor = "green";
     }
-    function selectionClique( txt )
+    function selectionClique( element )
     {
         var sub = document.getElementById("subject");
-        sub.value = txt;
+        sub.dataset.id = element.id;
+        sub.value = element.innerHTML;
         res.innerHTML = "";
     }
 
