@@ -1,6 +1,7 @@
 <?php
 header("Content-Type: text/plain");
 $fichier = fopen( "content/data.csv" , "r" );
+
 $result = array();
 while( $ligne = fgets($fichier))
 {
@@ -12,4 +13,4 @@ while( $ligne = fgets($fichier))
         'type' => $ligne[4]);
 	array_push($result,$post_data);
 }
-echo json_encode($result, JSON_FORCE_OBJECT);
+echo json_encode($result);
