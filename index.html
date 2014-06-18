@@ -46,8 +46,9 @@
             }else{
                 console.log('on indique le fail');
             }
-            clearCanvas();
-            station = drawRandomCircle(stations);
+            clearCanvas(context, canvas);
+            clearInput(autoload);
+            station = drawRandomCircle(stations, canvas);
         }
     }
 
@@ -56,6 +57,9 @@
      */
     function request(callback){
         var xhr = getXMLHttpRequest();
+        var url = "ChargementStations.php";
+        var method = "GET";
+        var sync = true;
 
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
@@ -63,8 +67,12 @@
             }
         };
 
-        xhr.open("GET", "ChargementStations.php" , true);
+        xhr.open(method, url, sync);
         xhr.send(null);
+    }
+
+    function clearInput(input){
+        input.value = '';
     }
 
     /**
@@ -77,15 +85,16 @@
 
     /**
      * @param stations
+     * @param canvas
      * @return station
      */
-    function drawRandomCircle(stations){
+    function drawRandomCircle(stations, canvas){
         var station = stations[random(stations)];
-        drawCircle(canvas, station.x, station.y);
+        drawCircle(canvas, station.x, station.y, context);
         return station;
     }
 
-    function clearCanvas(){
+    function clearCanvas(context, canvas){
         context.clearRect(0, 0, canvas.width, canvas.height);
     }
 
@@ -120,10 +129,12 @@
 
     /**
      * Draw a circle at a specific location within the canvas
+     * @param canvas
      * @param x
      * @param y
+     * @param context
      */
-    function drawCircle(canvas, x, y){
+    function drawCircle(canvas, x, y, context){
         var RESIZE = 10;
         var RADIUS = 4;
 
@@ -137,7 +148,7 @@
     /**
      *
      */
-    function drawText(name, x, y){
+    function drawText(name, x, y, context){
         var RESIZE = 10;
         context.font = "bold 8px Arial";
         context.fillStyle = 'black';
