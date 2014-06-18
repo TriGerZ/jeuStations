@@ -6,8 +6,8 @@ $result = array();
 while( $ligne = fgets($fichier))
 {
     $ligne = explode(';', trim($ligne));
-    $post_data = array('year' => $ligne[0],
-        'name' => htmlentities($ligne[1]),
+    $post_data = array('id' => $ligne[0],
+        'name' => $ligne[1],
         'x' => $ligne[2],
         'y' => $ligne[3],
         'type' => $ligne[4]);
