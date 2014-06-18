@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
     <title>jeuStations</title>
+    <style type="text/css" media="screen">
+        canvas, img { display:block; margin:1em auto; border:1px solid black; }
+        canvas { background:url('content/carte.jpg') }
+    </style>
 </head>
 <body>
 
@@ -9,33 +14,36 @@
     L'objet Canvas ne marche pas chez vous, veuillez utiliser un navigateur récent.
 </canvas>
 
+<input type="text" name="subject" id="subject" onkeyup="refreshAC()"  />
+<div id="result" style="margin-left: 3px;width: 150px;border-left: solid black 1px;border-right: solid black 1px;border-bottom: solid black 1px;"  ></div>
+
 <script>
     var canvas = document.getElementById('carte_ratp');
     var context = canvas.getContext('2d');
-    var imageObj = new Image();
-
-    imageObj.onload = function() {
-        context.drawImage(imageObj, 0, 0);
-    };
-    imageObj.src = "content/carte.jpg";
-
+    var xhr = getXMLHttpRequest();
+    var stations;
+    var res = document.getElementById("result");
     window.onload = function()
     {
-        var xhr = getXMLHttpRequest();
         xhr.open("GET", "ChargementStations.php" , true);
         xhr.send(null);
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
-                var stations = JSON.parse(xhr.responseText);
-                console.log(stations[0]);
-                var item = stations[0];
-                drawCircle(canvas, item.x/10, item.y/10);
+                stations = JSON.parse(xhr.responseText);
+                var item = stations[1];
+                stations.forEach(function(station){
+                    if(station.type == 'metro'){
+                        drawCircle(canvas, station.x, station.y);
+                    }
+
+                })
+
             }
         };
     }
 
-    /*
-     Charge l'objet HttpRequest
+    /**
+     * Charge l'objet HttpRequest
      */
 
     function getXMLHttpRequest() {
@@ -63,14 +71,26 @@
      * @param x
      * @param y
      */
-    function drawCircle(canvas, x, y){
-        var radius = 8;
+    function drawCircle(canvas, x, y, name){
+        var RESIZE = 10;
+        var RADIUS = 8;
 
         context.beginPath();
-        context.arc(x, y, radius, 0, 2 * Math.PI, false);
+        context.arc(x/RESIZE, y/RESIZE, RADIUS, 0, 2 * Math.PI, false);
         context.fillStyle = 'red';
         context.fill();
         context.stroke();
+        // console.log(name);
+
+        context.font = "bold 16px Arial";
+        context.fillText(name, x, y);
+    }
+
+    function drawText(name, x, y){
+        var RESIZE = 10;
+        context.font = "bold 8px Arial";
+        context.fillStyle = 'black';
+        context.fillText(name, x/RESIZE, y/RESIZE);
     }
 
     /**
@@ -85,20 +105,43 @@
     }
 
     /**
-     *
-     * @param complet
-     * @returns {Array}
+     * Refresh the autocomplete
      */
-    function getGares( complet )
+    function refreshAC()
     {
 
-        var a = new Array();
+        var sub = document.getElementById("subject");
+        var val = sub.value;
 
-        for( i = 0; i < complet.length ; i++)
+        res.innerHTML = "";
+        if( val != "" )
         {
-            a.push(complet[i]);
+            stations.forEach(function(station){
+                if(station.type =='metro'){
+                    var rgxp = new RegExp('^'+val, "g");
+                    if(station.name.match(rgxp) != null && station.name.match(rgxp).length){
+
+                        res.innerHTML += "<div id='element' onmouseout='selectionPointer2(this)' onmouseover='selectionPointer(this)' onclick='selectionClique(this.innerHTML)'>"+station.name+"</div>";
+
+                    }
+                }
+            });
         }
-        return a;
+    }
+
+    function selectionPointer2( id )
+    {
+        id.style.backgroundColor = "white";
+    }
+    function selectionPointer( id )
+    {
+        id.style.backgroundColor = "green";
+    }
+    function selectionClique( txt )
+    {
+        var sub = document.getElementById("subject");
+        sub.value = txt;
+        res.innerHTML = "";
     }
 
 </script>
