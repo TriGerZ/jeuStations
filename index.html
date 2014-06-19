@@ -24,12 +24,14 @@
     var context = canvas.getContext('2d');
     var autoload = document.getElementById('subject');
     var submit = document.getElementById('submit');
-    var stations;
-
     var res = document.getElementById("result");
     var station;
+    var stations;
+    var userAnswers = [];
+
     window.onload = function()
     {
+        var goodAnswers = [];
         request(readData);
 
         autoload.onkeyup = function(){
@@ -38,6 +40,14 @@
 
         submit.onclick = function(){
             var userStation = autoload.dataset.id;
+
+            //stock user answer
+            userAnswers.push(autoload.value);
+
+            //stock real station
+            goodAnswers.push(station);
+            console.log('goodAnswers: '+goodAnswers)
+            console.log('answers: '+userAnswers)
             console.log('station: '+station)
             console.log('station id: '+station.id)
             console.log('userStation: ' + userStation)
@@ -48,7 +58,7 @@
             }
             clearCanvas(context, canvas);
             clearInput(autoload);
-            station = drawRandomCircle(stations, canvas);
+            station = drawRandomCircle(stations, canvas, 'red');
         }
     }
 
@@ -57,7 +67,7 @@
      */
     function request(callback){
         var xhr = getXMLHttpRequest();
-        var url = "ChargementStations.php";
+        var url = "requests.php";
         var method = "GET";
         var sync = true;
 
@@ -80,17 +90,18 @@
      */
     function readData(rawData){
         stations = JSON.parse(rawData).filter(isMetro);
-        station = drawRandomCircle(stations);
+        station = drawRandomCircle(stations, canvas, 'red');
     }
 
     /**
      * @param stations
      * @param canvas
+     * @param color
      * @return station
      */
-    function drawRandomCircle(stations, canvas){
+    function drawRandomCircle(stations, canvas, color){
         var station = stations[random(stations)];
-        drawCircle(canvas, station.x, station.y, context);
+        drawCircle(canvas, station.x, station.y, context, color);
         return station;
     }
 
@@ -134,13 +145,13 @@
      * @param y
      * @param context
      */
-    function drawCircle(canvas, x, y, context){
+    function drawCircle(canvas, x, y, context, color){
         var RESIZE = 10;
         var RADIUS = 4;
 
         context.beginPath();
         context.arc(x/RESIZE, y/RESIZE, RADIUS, 0, 2 * Math.PI, false);
-        context.fillStyle = 'red';
+        context.fillStyle = color;
         context.fill();
         context.stroke();
     }
@@ -175,20 +186,21 @@
             var val = sub.value;
 
             res.innerHTML = "";
+            var autoloadContent ='';
             if( val != "" )
             {
                 stations.forEach(function(station){
                     var rgxp = new RegExp('^'+val, "g");
                     if(station.name.match(rgxp) != null && station.name.match(rgxp).length){
-                        res.innerHTML += "<div id="+station.id+" onmouseout='selectionPointer2(this)' onmouseover='selectionPointer(this)' onclick='selectionClique(this)'>"+station.name+"</div>";
+                        autoloadContent += "<div id="+station.id+" onmouseout='selectionPointer2(this)' onmouseover='selectionPointer(this)' onclick='selectionClique(this)'>"+station.name+"</div>";
                     }
                 });
             }
+            res.innerHTML = autoloadContent;
         }
         catch (err){
             console.log(err);
         }
-
     }
 
     function selectionPointer2( element )
