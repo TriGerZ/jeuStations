@@ -40,7 +40,7 @@ window.onload = function()
     }
 
     submit.onclick = function(){
-        if(sub.innerHTML != ''){
+        if(sub.value != ''){
             var userStation = autoload.dataset.id;
 
             //stock user answer
@@ -186,7 +186,6 @@ function random( tab )
 function refreshAC(stations)
 {
     try{
-        var sub = document.getElementById("subject");
         var val = sub.value;
 
         res.innerHTML = "";
