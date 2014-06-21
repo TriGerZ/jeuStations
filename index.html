@@ -4,9 +4,10 @@
     <meta charset="utf-8">
     <title>jeuStations</title>
     <style type="text/css" media="screen">
-        canvas, img { display:block; margin:1em auto; border:1px solid black; }
+        canvas, img { display:block; margin:1em auto; border:1px solid black;border-radius: 5px; }
         canvas { background:url('content/carte.jpg') }
-        #quest{ width: 270px;margin: auto;}
+        #content{ height: 120px; border:1px solid black;border-radius: 5px;background-color: AliceBlue; border-radius: 5px;width: 808px;margin: auto;}
+         #quest{width: 270px;margin: auto;}
     </style>
 </head>
 <body>
@@ -14,12 +15,14 @@
 <canvas id="carte_ratp" width="810" height="808">
     L'objet Canvas ne marche pas chez vous, veuillez utiliser un navigateur récent.
 </canvas>
-<div id="quest">
-<h2>Quelle est cette station ?</h2>
-<input type="text" name="subject" id="subject"  />
-<button id="submit">Valider</button>
-<div id="result" style="margin-left: 3px;width: 150px;border-left: solid black 1px;border-right: solid black 1px;border-bottom: solid black 1px;"  ></div>
-<div id="indicatiion"></div>
+<div id="content">
+    <div id="quest">
+    <h2>Quelle est cette station ?</h2>
+    <input type="text" name="subject" id="subject"  />
+    <button id="submit">Valider</button>
+    <div id="result" style="margin-left: 3px;width: 150px;border-left: solid black 1px;border-right: solid black 1px;border-bottom: solid black 1px;"  ></div>
+    <div id="indicatiion"></div>
+    </div>
 </div>
 <script>
 var canvas = document.getElementById('carte_ratp');
@@ -64,11 +67,11 @@ window.onload = function()
             if(userStation == station.id){
                 console.log('On lui rajoute un point');
                 score++;
-                ind.innerHTML = "Bonne réponse";
+                ind.innerHTML = "<span style='color: green;'>Bonne réponse</span>";
 
             }else{
                 console.log('on indique le fail');
-                ind.innerHTML = "Mauvaise réponse";
+                ind.innerHTML = "<span style='color: red;'>Mauvaise réponse</span>";
             }
             question++;
             if( question >= 10 )
@@ -233,7 +236,7 @@ function selectionPointer2( element )
 }
 function selectionPointer( element )
 {
-    element.style.backgroundColor = "green";
+    element.style.backgroundColor = "blue";
 }
 function selectionClique( element )
 {
