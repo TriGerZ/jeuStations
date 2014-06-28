@@ -10,7 +10,7 @@ include_once('constantes.php');
 
 header("Content-Type: text/html");
 
-$action = (isset($_GET["action"])) ? $_GET["action"] : NULL;
+$action = (isset($_POST["action"])) ? $_POST["action"] : NULL;
 
 if (!count($_SESSION)) {
     init();

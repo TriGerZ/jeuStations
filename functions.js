@@ -32,9 +32,9 @@ function init() {
 
 function reset() {
     var xhr = getXMLHttpRequest();
-
-    xhr.open("GET", "handlingData.php?action=reset", true);
-    xhr.send(null);
+    xhr.open("POST", "handlingData.php", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.send("action=reset");
 }
 
 function update() {
@@ -125,8 +125,9 @@ function handleServer(callback, action) {
         }
     };
 
-    xhr.open("GET", "handlingData.php?action=" + action, false);
-    xhr.send(null);
+    xhr.open("POST", "handlingData.php", false);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.send("action="+ action);
 }
 
 function getXMLHttpRequest() {
