@@ -9,4 +9,5 @@
 /**
  * File which contains data
  */
-const FILE_DATA = 'content/data.csv';
+const FILE_DATA_NAME = 'content/data.csv';
+const RESIZE = 10;

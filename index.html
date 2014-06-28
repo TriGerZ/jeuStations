@@ -7,244 +7,26 @@
         canvas, img { display:block; margin:1em auto; border:1px solid black;border-radius: 5px; }
         canvas { background:url('content/carte.jpg') }
         #content{ height: 120px; border:1px solid black;border-radius: 5px;background-color: AliceBlue; border-radius: 5px;width: 808px;margin: auto;}
-         #quest{width: 270px;margin: auto;}
+        #quest{width: 270px;margin: auto;}
     </style>
 </head>
 <body>
-
 <canvas id="carte_ratp" width="810" height="808">
     L'objet Canvas ne marche pas chez vous, veuillez utiliser un navigateur récent.
 </canvas>
 <div id="content">
     <div id="quest">
-    <h2>Quelle est cette station ?</h2>
-    <input type="text" name="subject" id="subject"  />
-    <button id="submit">Valider</button>
-    <div id="result" style="margin-left: 3px;width: 150px;border-left: solid black 1px;border-right: solid black 1px;border-bottom: solid black 1px;"  ></div>
-    <div id="indicatiion"></div>
+        <h2>Quelle est cette station ?</h2>
+        <input type="text" name="subject" id="subject"  />
+        <button id="submit">Valider</button>
+        <div id="result" style="margin-left: 3px;width: 150px;border-left: solid black 1px;border-right: solid black 1px;border-bottom: solid black 1px;"  ></div>
+        <div id="indicatiion"></div>
     </div>
 </div>
-<script>
-var canvas = document.getElementById('carte_ratp');
-var context = canvas.getContext('2d');
-var autoload = document.getElementById('subject');
-var submit = document.getElementById('submit');
-var res = document.getElementById("result");
-var sub = document.getElementById("subject");
-var ind = document.getElementById("indicatiion");
-
-var station;
-var stations;
-var userAnswers = [];
-var question = 1;
-var score = 0;
 
 
 
-window.onload = function()
-{
-    var goodAnswers = [];
-    request(readData);
 
-    autoload.onkeyup = function(){
-        refreshAC(stations);
-    }
-
-    submit.onclick = function(){
-        if(sub.value != ''){
-            var userStation = autoload.dataset.id;
-
-            //stock user answer
-            userAnswers.push(autoload.value);
-
-            //stock real station
-            goodAnswers.push(station);
-            console.log('goodAnswers: '+goodAnswers)
-            console.log('answers: '+userAnswers)
-            console.log('station: '+station)
-            console.log('station id: '+station.id)
-            console.log('userStation: ' + userStation)
-            if(userStation == station.id){
-                console.log('On lui rajoute un point');
-                score++;
-                ind.innerHTML = "<span style='color: green;'>Bonne réponse</span>";
-
-            }else{
-                console.log('on indique le fail');
-                ind.innerHTML = "<span style='color: red;'>Mauvaise réponse</span>";
-            }
-            question++;
-            if( question >= 10 )
-            {
-                document.getElementById("carte_ratp").style.display = "none";
-                document.getElementById("quest").innerHTML = "Merci d'avoir joué, Vous avez un score de "+score+"/10";
-
-            }
-            else
-            {
-                clearCanvas(context, canvas);
-                clearInput(autoload);
-                station = drawRandomCircle(stations, canvas, 'red');
-            }
-        }
-
-    }
-}
-
-/**
- *
- */
-function request(callback){
-    var xhr = getXMLHttpRequest();
-    var url = "requests.php";
-    var method = "GET";
-    var sync = false;
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
-            callback(xhr.responseText);
-        }
-    };
-
-    xhr.open(method, url, sync);
-    xhr.send(null);
-}
-
-function clearInput(input){
-    input.value = '';
-}
-
-/**
- * @param rawData
- */
-function readData(rawData){
-    stations = JSON.parse(rawData).filter(isMetro);
-    station = drawRandomCircle(stations, canvas, 'red');
-}
-
-/**
- * @param stations
- * @param canvas
- * @param color
- * @return station
- */
-function drawRandomCircle(stations, canvas, color){
-    var station = stations[random(stations)];
-    drawCircle(canvas, station.x, station.y, context, color);
-    return station;
-}
-
-function clearCanvas(context, canvas){
-    context.clearRect(0, 0, canvas.width, canvas.height);
-}
-
-
-function isMetro(station){
-    return (station.type == 'metro');
-}
-
-/**
- * Charge l'objet HttpRequest
- */
-
-function getXMLHttpRequest() {
-    var xhr = null;
-    if (window.XMLHttpRequest || window.ActiveXObject) {
-        if (window.ActiveXObject) {
-            try {
-                xhr = new ActiveXObject("Msxml2.XMLHTTP");
-            } catch(e) {
-                xhr = new ActiveXObject("Microsoft.XMLHTTP");
-            }
-        } else {
-            xhr = new XMLHttpRequest();
-        }
-    } else {
-        alert("Votre navigateur ne supporte pas l'objet XMLHTTPRequest...");
-        return null;
-    }
-
-    return xhr;
-}
-
-/**
- * Draw a circle at a specific location within the canvas
- * @param canvas
- * @param x
- * @param y
- * @param context
- */
-function drawCircle(canvas, x, y, context, color){
-    var RESIZE = 10;
-    var RADIUS = 4;
-
-    context.beginPath();
-    context.arc(x/RESIZE, y/RESIZE, RADIUS, 0, 2 * Math.PI, false);
-    context.fillStyle = color;
-    context.fill();
-    context.stroke();
-}
-
-/**
- *
- */
-function drawText(name, x, y, context){
-    var RESIZE = 10;
-    context.font = "bold 8px Arial";
-    context.fillStyle = 'black';
-    context.fillText(name, x/RESIZE, y/RESIZE);
-}
-
-/**
- * Return a random number between 0 and the number of object inside tab
- * @param tab
- * @returns {number}
- */
-function random( tab )
-{
-    return Math.floor(tab.length * Math.random());
-}
-
-/**
- * Refresh the autocomplete
- */
-function refreshAC(stations)
-{
-    try{
-        var val = sub.value;
-
-        res.innerHTML = "";
-        var autoloadContent ='';
-        if( val != "" )
-        {
-            stations.forEach(function(station){
-                var rgxp = new RegExp('^'+val, "g");
-                if(station.name.match(rgxp) != null && station.name.match(rgxp).length){
-                    autoloadContent += "<div id="+station.id+" onmouseout='selectionPointer2(this)' onmouseover='selectionPointer(this)' onclick='selectionClique(this)'>"+station.name+"</div>";
-                }
-            });
-        }
-        res.innerHTML = autoloadContent;
-    }
-    catch (err){
-        console.log(err);
-    }
-}
-
-function selectionPointer2( element )
-{
-    element.style.backgroundColor = "white";
-}
-function selectionPointer( element )
-{
-    element.style.backgroundColor = "blue";
-}
-function selectionClique( element )
-{
-    sub.dataset.id = element.id;
-    sub.value = element.innerHTML;
-    res.innerHTML = "";
-}
-
-</script>
+<script src="functions.js"></script>
 </body>
 </html>
