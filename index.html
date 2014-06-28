@@ -3,29 +3,27 @@
 <head>
     <meta charset="utf-8">
     <title>jeuStations</title>
-    <style type="text/css" media="screen">
-        canvas, img { display:block; margin:1em auto; border:1px solid black;border-radius: 5px; }
-        canvas { background:url('content/carte.jpg') }
-        #content{ height: 120px; border:1px solid black;border-radius: 5px;background-color: AliceBlue; border-radius: 5px;width: 808px;margin: auto;}
-        #quest{width: 270px;margin: auto;}
-    </style>
+    <link rel="stylesheet" type="text/css" media="screen" href="general.css">
 </head>
 <body>
 <canvas id="carte_ratp" width="810" height="808">
     L'objet Canvas ne marche pas chez vous, veuillez utiliser un navigateur récent.
 </canvas>
 <div id="content">
+    <div class="box">
+        score : <span id="userScore"></span> / <span id="numberOfQuestions"></span>
+        <br>
+        question numéro : <span id="questionNumber"></span>
+    </div>
+
     <div id="quest">
         <h2>Quelle est cette station ?</h2>
         <input type="text" name="subject" id="subject"  />
         <button id="submit">Valider</button>
-        <div id="result" style="margin-left: 3px;width: 150px;border-left: solid black 1px;border-right: solid black 1px;border-bottom: solid black 1px;"  ></div>
-        <div id="indicatiion"></div>
+        <div id="result" class="result"></div>
+        <div id="indication"></div>
     </div>
 </div>
-
-
-
 
 <script src="functions.js"></script>
 </body>

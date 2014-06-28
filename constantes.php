@@ -11,3 +11,4 @@
  */
 const FILE_DATA_NAME = 'content/data.csv';
 const RESIZE = 10;
+const MAX_QUESTIONS = 10;
